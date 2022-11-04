@@ -29,6 +29,15 @@ func (c *ProjectDestroyCommand) Run(args []string) int {
 		return 1
 	}
 
+	// From pairing with Cassie:
+	// If no project of that name, pass an error message
+	// Not sure how to access Ref_Project, or what to access on Ref_Project
+	// `project destroy amy` or any name that doesn't exist should pass an informational "error" message
+	if c.project. == "" {
+		c.ui.Output("The -project flag must be set.", terminal.WithErrorStyle())
+		return 1
+	}
+
 	// Get the project we're destroying
 	project, err := c.project.Client().GetProject(c.Ctx, &pb.GetProjectRequest{
 		Project: c.project.Ref(),
