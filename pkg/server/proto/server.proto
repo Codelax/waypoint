@@ -2481,6 +2481,22 @@ message ListJobsResponse {
   repeated Job jobs = 1;
 }
 
+message LatestJobRequest {
+  Ref.Workspace workspace = 1;
+  Ref.Project project = 2;
+  Ref.Application application = 3;
+  OperationType operation_type = 4;
+
+  enum OperationType {
+		ANY = 0;
+    INIT = 1;
+    BUILD = 2;
+		PUSH = 3;
+    DEPLOY = 4;
+    RELEASE = 5;
+  }
+}
+
 message GetJobStreamRequest {
   string job_id = 1;
 

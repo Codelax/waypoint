@@ -1169,6 +1169,13 @@ func (s *State) JobIsAssignable(ctx context.Context, jobpb *pb.Job) (bool, error
 	}
 }
 
+// JobByLatest looks up the latest job for the given criteria. The returned Job
+// will be a deep copy of the job so it is safe to read/write. If the job can't
+// be found, a nil result with no error is returned.
+func (s *State) JobLatest(ctx context.Context, req *pb.LatestJobRequest) (*pb.Job, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
 // jobIndexInit initializes the config index from persisted data.
 func (s *State) jobIndexInit(dbTxn *bolt.Tx, memTxn *memdb.Txn) error {
 	bucket := dbTxn.Bucket(jobBucket)
