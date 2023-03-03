@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/docker/cli/cli/connhelper"
 	"github.com/docker/docker/api/types"
@@ -84,8 +85,10 @@ func AlterEntrypoint(
 		}
 	}
 
+	// Add edited entrypoint as a Dockerfile instruction
+	var containerChanges []string
 	if newEp.Entrypoint != nil {
-		icfg.Entrypoint = newEp.Entrypoint
+		containerChanges = append(containerChanges, formatEntrypoint(newEp.Entrypoint))
 	}
 
 	if newEp.NewImage == "" {
@@ -147,7 +150,7 @@ func AlterEntrypoint(
 	idr, err := dc.ContainerCommit(ctx, body.ID, types.ContainerCommitOptions{
 		Reference: newEp.NewImage,
 		Comment:   fmt.Sprintf("Alter image '%s' to modify entrypoint", image),
-		Config:    icfg,
+		Changes:   containerChanges,
 	})
 	if err != nil {
 		return "", err
@@ -196,4 +199,12 @@ func withConnectionHelper(c *client.Client) error {
 
 func containsEntrypoint(entrypoint []string) bool {
 	return len(entrypoint) > 0 && entrypoint[0] == "/waypoint-entrypoint"
+}
+
+func formatEntrypoint(entrypoint []string) string {
+	formattedEntrypoint := make([]string, 0, len(entrypoint))
+	for _, s := range entrypoint {
+		formattedEntrypoint = append(formattedEntrypoint, fmt.Sprintf("%q", s))
+	}
+	return "ENTRYPOINT [" + strings.Join(formattedEntrypoint, ", ") + "]"
 }
